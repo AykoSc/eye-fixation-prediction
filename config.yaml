@@ -1,0 +1,23 @@
+# The number of samples per batch.
+batch_size: 16
+
+# The learning rate for the optimizer.
+learning_rate: 0.001
+
+# The number of epochs to train the model for.
+num_epochs: 10
+
+# The number of worker processes for data loading. CPU and memory intensive.
+num_workers: 6
+
+# The file to load the model checkpoint from. If this is null, the model is initialized from scratch.
+checkpoint_file: null
+
+# The type of model to train. This should be one of the model types in the models module.
+model_type: "ResNet50FCN"
+
+# The validation loss is calculated and shown after every epoch if true.
+show_val_loss: false
+
+# The last image of the epoch is displayed with pred and target fixation maps if true.
+show_last_image: true

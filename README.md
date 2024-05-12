@@ -1,0 +1,1 @@
+To view the live plot of the loss in TensorBoard, you can run `tensorboard --logdir=runs` in your command line and navigate to [localhost:6006](http://localhost:6006) in your web browser, then refresh the page (top right refresh button) as desired.
