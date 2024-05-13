@@ -26,5 +26,5 @@ class SimpleCNN(nn.Module):
         xb = xb.view(-1, 32 * 56 * 56)
         xb = f.relu(self.fc1(xb))
         xb = self.fc2(xb)
-        xb = torch.sigmoid(xb)
+
         return xb.view(-1, 1, 224, 224)

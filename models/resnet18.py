@@ -1,4 +1,3 @@
-import torch
 import torch.nn as nn
 from torchvision import models
 from torchvision.models import ResNet18_Weights
@@ -22,5 +21,5 @@ class ResNet18(nn.Module):
         xb = self.resnet.fc(xb)
         xb = f.relu(self.fc1(xb))  # Apply ReLU activation function
         xb = self.fc2(xb)
-        xb = torch.sigmoid(xb)
+
         return xb.view(-1, 1, 224, 224)

@@ -1,11 +1,11 @@
 import os
 
-import yaml
-
 import torch
+import yaml
 from torch import optim
-from torch.nn import BCELoss
+from torch.nn import BCEWithLogitsLoss
 from torch.utils.tensorboard import SummaryWriter
+from torchvision.utils import make_grid
 
 from dataset import get_dataloader
 from logger import logger
@@ -14,8 +14,6 @@ from models.resnet50 import ResNet50FCN
 from models.simple_cnn import SimpleCNN
 from utils import get_device
 
-
-# General TODO s: flipping/rotation of images and their fixations for data augmentation, ...
 
 def main():
     # Configuration
@@ -51,11 +49,8 @@ def main():
     model = model.to(device)
 
     opt = optim.SGD(model.parameters(), lr=learning_rate)
-    loss_func = BCELoss()
+    loss_func = BCEWithLogitsLoss()
     if checkpoint_file is None:
-        # Initialize weights
-
-        # Set loss to None
         start_epoch = 1
         loss = None
     else:
@@ -79,15 +74,22 @@ def main():
             loss = loss_func(pred, fixations)
 
             if show_last_image and i == len(train_loader) - 1:
-                # Select the first image in the batch
-                image = images[0]
-                pred_map = pred[0]
-                fixation_map = fixations[0]
+                # Unnormalize image
+                mean = torch.tensor([0.485, 0.456, 0.406]).view(1, 3, 1, 1).to(device)
+                std = torch.tensor([0.229, 0.224, 0.225]).view(1, 3, 1, 1).to(device)
+                image_unnorm = images * std + mean  # Unnormalized images
+
+                pred_map = torch.sigmoid(pred)  # Apply sigmoid to pred_map
+
+                # Make grids
+                image_grid = make_grid(image_unnorm)
+                pred_map_grid = make_grid(pred_map)
+                fixation_map_grid = make_grid(fixations)
 
                 # Add images to TensorBoard
-                writer.add_image('Image', image, global_step=epoch)
-                writer.add_image('Predicted Fixation Map', pred_map, global_step=epoch)
-                writer.add_image('Target Fixation Map', fixation_map, global_step=epoch)
+                writer.add_image('Image', image_grid, global_step=epoch)
+                writer.add_image('Predicted Fixation Map', pred_map_grid, global_step=epoch)
+                writer.add_image('Target Fixation Map', fixation_map_grid, global_step=epoch)
 
             # Backward and optimize
             opt.zero_grad()
@@ -106,8 +108,6 @@ def main():
             'optimizer_state_dict': opt.state_dict(),
             'loss': loss.item(),
         }, os.path.join("checkpoints", f'{model_type}_{epoch}.pt'))
-
-        # Show image, pred and target fixation map
 
         model.eval()
         if show_val_loss:

@@ -7,3 +7,4 @@ torchvision
 imageio
 tensorboard
 PyYAML
+numpy

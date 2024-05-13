@@ -1,6 +1,9 @@
+import random
+
+from torchvision.transforms import functional as f
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
-import imageio
+import imageio.v2 as imageio
 import os
 
 
@@ -35,9 +38,25 @@ def get_dataloader(root_dir, image_file, fixation_file, batch_size=16, num_worke
                               image_transform=image_transform,
                               fixation_transform=fixation_transform)
 
-    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle, num_workers=num_workers)
+    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle,
+                            num_workers=num_workers, persistent_workers=True)
 
     return dataloader
+
+
+class RandomFlipPair(object):
+    def __init__(self, p=0.5):
+        self.p = p
+
+    def __call__(self, sample):
+        image, fixation = sample['image'], sample['fixation']
+        if random.random() < self.p:
+            image = f.hflip(image)
+            fixation = f.hflip(fixation)
+        if random.random() < self.p:
+            image = f.vflip(image)
+            fixation = f.vflip(fixation)
+        return {'image': image, 'fixation': fixation}
 
 
 class FixationDataset(Dataset):
@@ -60,11 +79,11 @@ class FixationDataset(Dataset):
         fix_name = os.path.join(self.root_dir, self.fixation_files[idx])
         fix = imageio.imread(fix_name)
 
+        if self.image_transform:
+            image = self.image_transform(image)
+        if self.fixation_transform:
+            fix = self.fixation_transform(fix)
+
         sample = {"image": image, "fixation": fix}
 
-        if self.image_transform:
-            sample["image"] = self.image_transform(sample["image"])
-        if self.fixation_transform:
-            sample["fixation"] = self.fixation_transform(sample["fixation"])
-
-        return sample
+        return RandomFlipPair()(sample)

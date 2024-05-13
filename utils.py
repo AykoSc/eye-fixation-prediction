@@ -13,3 +13,15 @@ def get_device():
     else:
         logger.info("Neither DirectML nor CUDA is available. Using CPU.")
         return torch.device("cpu")
+
+
+def gaussian(window_size: int, sigma: float, device=None) -> torch.Tensor:
+    dtype = None
+    if isinstance(sigma, torch.Tensor):
+        device, dtype = sigma.device, sigma.dtype
+    device = device or torch.device('cpu')
+    x = torch.arange(window_size, device=device, dtype=dtype) - window_size // 2
+    if window_size % 2 == 0:
+        x = x + 0.5
+    gauss = torch.exp(-x.pow(2.0) / (2 * sigma ** 2))
+    return gauss / gauss.sum()
