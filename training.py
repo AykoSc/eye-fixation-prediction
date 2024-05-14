@@ -2,9 +2,11 @@ import os
 
 import torch
 import yaml
+from PIL import Image
 from torch import optim
 from torch.nn import BCEWithLogitsLoss
 from torch.utils.tensorboard import SummaryWriter
+from torchvision import transforms
 from torchvision.utils import make_grid
 
 from dataset import get_dataloader
@@ -74,15 +76,14 @@ def main():
             loss = loss_func(pred, fixations)
 
             if show_last_image and i == len(train_loader) - 1:
-                # Unnormalize image
-                mean = torch.tensor([0.485, 0.456, 0.406]).view(1, 3, 1, 1).to(device)
-                std = torch.tensor([0.229, 0.224, 0.225]).view(1, 3, 1, 1).to(device)
-                image_unnorm = images * std + mean  # Unnormalized images
+                # Load the original image
+                image_path = batch['image_path'][0]
+                image_unnormed = Image.open(image_path)
 
                 pred_map = torch.sigmoid(pred)  # Apply sigmoid to pred_map
 
                 # Make grids
-                image_grid = make_grid(image_unnorm)
+                image_grid = make_grid(transforms.ToTensor()(image_unnormed))
                 pred_map_grid = make_grid(pred_map)
                 fixation_map_grid = make_grid(fixations)
 

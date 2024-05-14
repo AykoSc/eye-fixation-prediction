@@ -8,3 +8,4 @@ imageio
 tensorboard
 PyYAML
 numpy
+pillow
