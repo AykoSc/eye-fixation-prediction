@@ -31,6 +31,7 @@ def main():
     model_type = config['model_type']
     show_val_loss = config['show_val_loss']
     show_last_image = config['show_last_image']
+    #config states epochs = 10
 
     # Data Loading
     train_loader = get_dataloader(root_dir="data", image_file="data/train_images.txt",
