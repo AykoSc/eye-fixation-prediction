@@ -87,11 +87,11 @@ class RandomFlipPair(object):
         self.p = p
 
     def __call__(self, sample):
-        image, fixation = sample['image'], sample['fixation']
+        image, fixation, image_path = sample['image'], sample['fixation'], sample['image_path']
         if random.random() < self.p:
             image = f.hflip(image)
             fixation = f.hflip(fixation)
         if random.random() < self.p:
             image = f.vflip(image)
             fixation = f.vflip(fixation)
-        return {'image': image, 'fixation': fixation}
+        return {'image': image, 'fixation': fixation, 'image_path': image_path}

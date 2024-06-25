@@ -1,11 +1,8 @@
 torch-directml
-
---extra-index-url https://download.pytorch.org/whl/cu121
-torch
-torchvision
-
 imageio
 tensorboard
 PyYAML
 numpy
 pillow
+torch
+torchvision
