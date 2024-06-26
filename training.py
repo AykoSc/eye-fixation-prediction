@@ -18,6 +18,10 @@ from utils import get_device
 
 
 def main():
+    # Check if the checkpoints folder does not exist
+    if not os.path.exists("checkpoints"):
+        os.makedirs("checkpoints")
+
     # Configuration
     with open('config.yaml', 'r') as file:
         config = yaml.safe_load(file)
